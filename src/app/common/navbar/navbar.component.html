@@ -1,0 +1,22 @@
+<div class="sa-navbar" *ngIf="authenticated">
+  <nav id="sidebar">
+    <mat-tab-group>
+      <mat-tab label="WO">
+        <ul class="list-unstyled components">
+          <li *ngFor="let item of menuOptions; let i=index">
+            <span class="menu_icons {{item.icon}}" title="{{item.title}}" (click)="showChilds(i)" [ngClass]="{'active': item.highlight}"></span>
+            <ul class="listTab" *ngIf="item.isClicked && item.hasSubMenu">
+              <li class="cf" *ngFor="let subItem of item.subItems">
+                <div class="submenu_desp_width">
+                  <span class="submenu_header_desp">
+                    <a (click)="doMenuClick(subItem)">{{subItem.name}}</a>
+                  </span>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </mat-tab>
+    </mat-tab-group>
+  </nav>
+</div>

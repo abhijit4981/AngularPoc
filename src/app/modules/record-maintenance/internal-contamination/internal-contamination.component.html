@@ -1,0 +1,345 @@
+<div class="row">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 right-container">
+    <div class="panel panel-default">
+      <div class="panel-heading lvoilet-panel text-left row">
+        <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+          <h3 class="panel-title">Internal Dose Records</h3>
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6 ra-cancel-btn">
+          <a routerLink="/dashboard" class="none-deco"><span class="sec-button-link" role="button">Close</span></a>
+        </div>
+      </div>
+    </div>
+    <form name="employeeSearchForm" #employeeSearchForm="ngForm" (ngSubmit)="submitEmployeeSearch()" novalidate>
+      <div class="search-section row">
+        <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6 row">
+          <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6 emp-search">
+            <label>Employee Name / Number</label>
+            <div style="position: relative;">
+              <input type="text" class="form-control search-input" #employee 
+              (input)="searchEmployee(employee.value)" name="selectedEmployee" 
+              [(ngModel)]="employeeSearch.selectedEmployee" #selectedEmployee="ngModel" 
+              autocomplete="off" 
+              (ngModelChange)="onEmployeeSearchClear()" [ngClass]="{'is-invalid':searchEmployeeError}"  (blur)="hideEmployeeSearchResult()">
+              <ul class="emp-search-result" [hidden]="!hideSearchList">
+                <li class="emp-search-options" *ngFor="let employee of allEmployees$ | async" (click)="onSelectSearchEmployee(employee)">
+                  {{employee.lastName}}{{employee.firstName!=='' ? ", "+employee.firstName :''}}{{employee.participantId !== null ? " - "+employee.participantId :''}}
+                </li>
+                <!-- <li *ngIf="allEmpData.length == 0 && employeeSearch.selectedEmployee !='' && employeeSearch.selectedEmployee != null" class="emp-search-options">No match found.
+                </li> -->
+              </ul>
+            </div>
+            <div class="error" *ngIf="searchEmployeeError">{{searchEmployeeErrorMsg}}</div>
+          </div>
+          <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+            <label>Sample Date</label>
+            <mat-form-field class="function_time_box" [ngClass]="{'is-invalid':searchDateError}">
+              <input matInput [matDatepicker]="picker" 
+                name="startDate" [(ngModel)]="employeeSearch.startDate" #startDate="ngModel" 
+                (dateInput)="startDateSelected($event)"
+                placeholder="mm/dd/yyyy">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <div class="error" *ngIf="searchDateError || startDate.invalid">{{searchDateErrorMsg}}</div>
+          </div> 
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+          <div class="search-button-section float-right">
+            <button class="save-button float-left">Search</button>
+            <button class="cancel-button float-left margin-right25" (click)="onResetEmployeeSearchForm($event)">Clear</button>
+            <button class="save-button float-left" [disabled]="disableAddNew" [ngClass]="{'disable-button': disableAddNew}" (click)="onAddNewInternalDosimeter($event)">Add New</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 card-list-container row">
+    <div class="col-sm-3 col-md-3 col-lg-3">
+      <div class="no-result" *ngIf="noInternalResult">No results found.</div>
+      <div class="cards-left-panel" *ngIf="allInternalDoseResults.length>0">
+        <div class="col-md-12 col-sm-12 col-lg-12 card-listing">
+          <div class="card-repeat" *ngFor="let internalDoseResult of allInternalDoseResults; let i=index">
+            <div class="manage-each-card" [ngClass]="{'active': i===selectedInternalDose}">
+              <div class="card-style">
+                <div class="card-icon">
+                  <a class="enable-cursor" (click)="onEnableInternalDoseResultEdit(i, internalDoseResult, $event)"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                </div>
+                <a class="card-text" title="{{ (internalDoseResult.person.lastName===null) ? 'title' : ((internalDoseResult.person.firstName===null) ? internalDoseResult.person.lastName : ((storedSelectedEmployeeDetails.participantId===null) ? internalDoseResult.person.lastName+', '+internalDoseResult.person.firstName : internalDoseResult.person.lastName+', '+internalDoseResult.person.firstName+' - '+storedSelectedEmployeeDetails.participantId ))}}" (click)="onShowInternalDoseResult(i, internalDoseResult)" #clickShowEDRLink>
+                  <span *ngIf="internalDoseResult.person.lastName!==null">{{internalDoseResult.person.lastName}}</span>
+                  <span *ngIf="internalDoseResult.person.firstName!==null">, {{internalDoseResult.person.firstName}}</span>
+                  <span *ngIf="storedSelectedEmployeeDetails.participantId!==null"> - {{storedSelectedEmployeeDetails.participantId}}</span>
+                </a>
+                <p class="card-date">{{internalDoseResult.sampleDate | parseDate}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-9 col-md-9 col-lg-9 card-view-outer-section padding-lr-zero" *ngIf="showDetails">
+      <div class="card-view-outer">
+        <div class="card-view-outer-panel">
+          <form name="updateInternalResultForm" #updateInternalResultForm="ngForm" (ngSubmit)="updateInternalResultForm.form.valid && onUpdateInternalDoseResult()" novalidate>  
+            <div class="card-name-section">
+              <div class="card-name">
+                <span *ngIf="internalDoseResultObj.person.lastName!==null">{{internalDoseResultObj.person.lastName}}</span>
+                <span *ngIf="internalDoseResultObj.person.firstName!==null">, {{internalDoseResultObj.person.firstName}}</span>
+                <span *ngIf="storedSelectedEmployeeDetails.participantId!==null"> - {{storedSelectedEmployeeDetails.participantId}}</span>
+              </div>
+              <div class="contam-button-section float-right" *ngIf="formDisabled">
+                <button type="button" class="cancel-button margin-right25 float-left" (click)="onCancelInternalDoseResult($event)" >Cancel</button>
+                <button class="edit-button float-left" (click)="onEnableInternalDoseResultEdit(selectedInternalDose, internalDoseResultObj, $event)">Edit</button>
+              </div>
+              <div class="contam-button-section float-right" *ngIf="!formDisabled">
+                <button type="submit" class="save-button float-left" [ngClass]="{'is-disabled': !updateInternalResultForm.dirty}" [disabled]="!updateInternalResultForm.dirty">Save</button>
+                <button type="button" class="cancel-button float-right" (click)="onCancelInternalDoseResultEdit()" >Cancel</button>
+              </div>
+            </div>
+            <div class="card-subitem-list-container">
+              <div class="ui-helper-reset">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                  <div class="col-sm-6 col-md-6 col-lg6 form-group">
+                    <div class="form-field-wrap">
+                      <label for="location">Location<span class="req">*</span></label>
+                      <ng-select [items]="allLocations"
+                        bindValue="locationId"
+                        bindLabel="locationNameForDropdown"
+                        placeholder=""
+                        [(ngModel)]="internalDoseResultObj.locationId" #locationId="ngModel" name="locationId" [disabled]="formDisabled" [ngClass]="{ 'is-invalid': updateInternalResultForm.submitted && locationId.errors?.required }" tabindex="1" required>
+                      </ng-select>
+                    </div>
+                    <div *ngIf="updateInternalResultForm.submitted && locationId.invalid" class="invalid-feedback">
+                      <div *ngIf="locationId.errors.required">Location is required</div>
+                    </div>
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="sampleDate">Sample Date<span class="req">*</span></label>
+                        <div class="calendar_box" [ngClass]="{'input-disabled': formDisabled, 'is-invalid': (updateInternalResultForm.submitted && sampleDate.errors?.required)}">
+                          <input type="text" class="calendar-input-field" [owlDateTime]="dt2" name="sampleDate" [(ngModel)]="internalDoseResultObj.sampleDate" #sampleDate="ngModel" [disabled]="formDisabled" [ngClass]="{'input-disabled': formDisabled}" tabindex="2" placeholder="{{!formDisabled ? 'mm/dd/yyyy' : ''}}" required >
+                          <owl-date-time [pickerType]="'calendar'" #dt2></owl-date-time>
+                          <img src="/assets/images/calendar_icon.svg" class="wh-20 calendar-img trigger" [owlDateTimeTrigger]="dt2">
+                        </div>
+                      </div>
+                      <div *ngIf="updateInternalResultForm.submitted && sampleDate.invalid" class="invalid-feedback">
+                        <div *ngIf="sampleDate.errors.required">Sample date is required</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="dosimeterModeCode">Dose Mode<span class="req">*</span></label>
+                        <ng-select [items]="allDoseModeTypeRefs"
+                          bindValue="typeCode"
+                          bindLabel="description"
+                          placeholder=""
+                          [(ngModel)]="internalDoseResultObj.dosimeterModeCode" #dosimeterModeCode="ngModel" name="dosimeterModeCode" [disabled]="formDisabled" [ngClass]="{ 'is-invalid': updateInternalResultForm.submitted && dosimeterModeCode.errors?.required }" tabindex="6" required>
+                        </ng-select>
+                      </div>
+                      <div *ngIf="updateInternalResultForm.submitted && dosimeterModeCode.invalid" class="invalid-feedback">
+                        <div *ngIf="dosimeterModeCode.errors.required">Dose mode is required</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="derivedIntakeQty">Derived Intake (uCi)<span class="req">*</span></label>
+                        <input type="text" class="form-control" name="derivedIntakeQty" [(ngModel)]="internalDoseResultObj.derivedIntakeQty" #derivedIntakeQty="ngModel" [disabled]="formDisabled" [ngClass]="{ 'is-invalid': updateInternalResultForm.submitted && derivedIntakeQty.invalid }" tabindex="3" pattern="^\s*(?=.*[0-9])\d*(?:\.\d{1})?\s*$" required>
+                      </div>
+                      <div *ngIf="updateInternalResultForm.submitted && derivedIntakeQty.invalid" class="invalid-feedback">
+                        <div *ngIf="derivedIntakeQty.errors.required">Derived Intake (uCi) is required</div>
+                        <div *ngIf="derivedIntakeQty.errors.pattern">Invalid entry (e.g- x / x.x)</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="dosimeterClassCode">Dose Class<span class="req">*</span></label>
+                        <ng-select [items]="allDoseClassTypeRefs"
+                          bindValue="typeCode"
+                          bindLabel="description"
+                          placeholder=""
+                          [(ngModel)]="internalDoseResultObj.dosimeterClassCode" #dosimeterClassCode="ngModel" name="dosimeterClassCode" [disabled]="formDisabled" [ngClass]="{ 'is-invalid': updateInternalResultForm.submitted && dosimeterClassCode.errors?.required }" tabindex="7" required>
+                        </ng-select>
+                      </div>
+                      <div *ngIf="updateInternalResultForm.submitted && dosimeterClassCode.invalid" class="invalid-feedback">
+                        <div *ngIf="dosimeterClassCode.errors.required">Dose class is required</div>
+                      </div>
+                    </div>  
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="derivedCedeQty">Derived CEDE (mrem)<span class="req">*</span></label>
+                        <input type="number" class="form-control" name="derivedCedeQty" [(ngModel)]="internalDoseResultObj.derivedCedeQty" #derivedCedeQty="ngModel" [disabled]="formDisabled" min="1" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" [ngClass]="{ 'is-invalid': updateInternalResultForm.submitted && derivedCedeQty.errors?.required }" tabindex="4" required>
+                      </div>
+                      <div *ngIf="updateInternalResultForm.submitted && derivedCedeQty.invalid" class="invalid-feedback">
+                        <div *ngIf="derivedCedeQty.errors.required">Derived CEDE (mrem) is required</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="nuclideId">Radionuclide<span class="req">*</span></label>
+                        <ng-select [items]="allNuclides"
+                          bindValue="nuclideId"
+                          bindLabel="nuclideName"
+                          placeholder=""
+                          [(ngModel)]="internalDoseResultObj.nuclideId" #nuclideId="ngModel" name="nuclideId" [disabled]="formDisabled" [ngClass]="{ 'is-invalid': updateInternalResultForm.submitted && nuclideId.errors?.required }" tabindex="8" required>
+                        </ng-select>
+                      </div>  
+                      <div *ngIf="updateInternalResultForm.submitted && nuclideId.invalid" class="invalid-feedback">
+                        <div *ngIf="nuclideId.errors.required">Radionuclide is required</div>
+                      </div>
+                    </div>  
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="derivedCdeQty">Derived CDE (mrem)<span class="req">*</span></label>
+                        <input type="number" class="form-control" name="derivedCdeQty" [(ngModel)]="internalDoseResultObj.derivedCdeQty" #derivedCdeQty="ngModel" [disabled]="formDisabled" min="1" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" [ngClass]="{ 'is-invalid': updateInternalResultForm.submitted && derivedCdeQty.errors?.required }" tabindex="5" required>
+                      </div>
+                      <div *ngIf="updateInternalResultForm.submitted && derivedCdeQty.invalid" class="invalid-feedback">
+                        <div *ngIf="derivedCdeQty.errors.required">Derived CDE (mrem) is required</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>  
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-9 col-md-9 col-lg-9 card-view-outer-section padding-lr-zero" *ngIf="addNewForm">
+      <div class="card-view-outer">
+        <div class="card-view-outer-panel">
+          <form name="addInternalResultForm" #addInternalResultForm="ngForm" (ngSubmit)="addInternalResultForm.form.valid && onSaveAddInternalDoseResult()" novalidate>  
+            <div class="card-name-section">
+              <div class="card-name">
+                <span *ngIf="storedSelectedEmployeeDetails.lastName!=''">{{storedSelectedEmployeeDetails.lastName}}</span>
+                <span *ngIf="storedSelectedEmployeeDetails.firstName!=''">, {{storedSelectedEmployeeDetails.firstName}}</span>
+                <span *ngIf="storedSelectedEmployeeDetails.participantId!==null"> - {{storedSelectedEmployeeDetails.participantId}}</span>
+              </div>
+              <div class="contam-button-section float-right" *ngIf="!formDisabled">
+                <button type="submit" class="save-button float-left" [ngClass]="{'is-disabled': !addInternalResultForm.dirty}" [disabled]="!addInternalResultForm.dirty">Save</button>
+                <button type="button" class="cancel-button float-right" (click)="onCancelInternalDoseResultAdd()" >Cancel</button>
+              </div>
+            </div>
+            <div class="card-subitem-list-container">
+              <div class="ui-helper-reset">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                  <div class="col-sm-6 col-md-6 col-lg6 form-group">
+                    <div class="form-field-wrap">
+                      <label for="location">Location<span class="req">*</span></label>
+                      <ng-select [items]="allLocations"
+                        bindValue="locationId"
+                        bindLabel="locationNameForDropdown"
+                        placeholder=""
+                        [(ngModel)]="addIntDoseResultFormData.locationId" #locationId="ngModel" name="locationId" [disabled]="formDisabled" [ngClass]="{ 'is-invalid': addInternalResultForm.submitted && locationId.errors?.required }" tabindex="1" required>
+                      </ng-select>
+                    </div>
+                    <div *ngIf="addInternalResultForm.submitted && locationId.invalid" class="invalid-feedback">
+                      <div *ngIf="locationId.errors.required">Location is required</div>
+                    </div>
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="sampleDate">Sample Date<span class="req">*</span></label>
+                        <div class="calendar_box" [ngClass]="{'input-disabled': formDisabled, 'is-invalid': (addInternalResultForm.submitted && sampleDate.errors?.required)}">
+                          <input type="text" class="calendar-input-field" [owlDateTime]="dt3" name="sampleDate" [(ngModel)]="addIntDoseResultFormData.sampleDate" #sampleDate="ngModel" [disabled]="formDisabled" [ngClass]="{'input-disabled': formDisabled}" tabindex="2" placeholder="{{!formDisabled ? 'mm/dd/yyyy' : ''}}" required >
+                          <owl-date-time [pickerType]="'calendar'" #dt3></owl-date-time>
+                          <img src="/assets/images/calendar_icon.svg" class="wh-20 calendar-img trigger" [owlDateTimeTrigger]="dt3">
+                        </div>
+                      </div>
+                      <div *ngIf="addInternalResultForm.submitted && sampleDate.invalid" class="invalid-feedback">
+                        <div *ngIf="sampleDate.errors.required">Sample date is required</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="dosimeterModeCode">Dose Mode<span class="req">*</span></label>
+                        <ng-select [items]="allDoseModeTypeRefs"
+                          bindValue="typeCode"
+                          bindLabel="description"
+                          placeholder=""
+                          [(ngModel)]="addIntDoseResultFormData.dosimeterModeCode" #dosimeterModeCode="ngModel" name="dosimeterModeCode" [disabled]="formDisabled" [ngClass]="{ 'is-invalid': addInternalResultForm.submitted && dosimeterModeCode.errors?.required }" tabindex="6" required>
+                        </ng-select>
+                      </div>
+                      <div *ngIf="addInternalResultForm.submitted && dosimeterModeCode.invalid" class="invalid-feedback">
+                        <div *ngIf="dosimeterModeCode.errors.required">Dose mode is required</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="derivedIntakeQty">Derived Intake (uCi)<span class="req">*</span></label>
+                        <input type="text" class="form-control" name="derivedIntakeQty" [(ngModel)]="addIntDoseResultFormData.derivedIntakeQty" #derivedIntakeQty="ngModel" [disabled]="formDisabled" [ngClass]="{ 'is-invalid': addInternalResultForm.submitted && derivedIntakeQty.invalid }" tabindex="3" pattern="^\s*(?=.*[0-9])\d*(?:\.\d{1})?\s*$" required>
+                      </div>
+                      <div *ngIf="addInternalResultForm.submitted && derivedIntakeQty.invalid" class="invalid-feedback">
+                        <div *ngIf="derivedIntakeQty.errors.required">Derived Intake (uCi) is required</div>
+                        <div *ngIf="derivedIntakeQty.errors.pattern">Invalid entry (e.g- x / x.x)</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="dosimeterClassCode">Dose Class<span class="req">*</span></label>
+                        <ng-select [items]="allDoseClassTypeRefs"
+                          bindValue="typeCode"
+                          bindLabel="description"
+                          placeholder=""
+                          [(ngModel)]="addIntDoseResultFormData.dosimeterClassCode" #dosimeterClassCode="ngModel" name="dosimeterClassCode" [disabled]="formDisabled" [ngClass]="{ 'is-invalid': addInternalResultForm.submitted && dosimeterClassCode.errors?.required }" tabindex="7" required>
+                        </ng-select>
+                      </div>
+                      <div *ngIf="addInternalResultForm.submitted && dosimeterClassCode.invalid" class="invalid-feedback">
+                        <div *ngIf="dosimeterClassCode.errors.required">Dose class is required</div>
+                      </div>
+                    </div>  
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="derivedCedeQty">Derived CEDE (mrem)<span class="req">*</span></label>
+                        <input type="number" class="form-control" name="derivedCedeQty" [(ngModel)]="addIntDoseResultFormData.derivedCedeQty" #derivedCedeQty="ngModel" [disabled]="formDisabled" min="1" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" [ngClass]="{ 'is-invalid': addInternalResultForm.submitted && derivedCedeQty.errors?.required }" tabindex="4" required>
+                      </div>
+                      <div *ngIf="addInternalResultForm.submitted && derivedCedeQty.invalid" class="invalid-feedback">
+                        <div *ngIf="derivedCedeQty.errors.required">Derived CEDE (mrem) is required</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="nuclideId">Radionuclide<span class="req">*</span></label>
+                        <ng-select [items]="allNuclides"
+                          bindValue="nuclideId"
+                          bindLabel="nuclideName"
+                          placeholder=""
+                          [(ngModel)]="addIntDoseResultFormData.nuclideId" #nuclideId="ngModel" name="nuclideId" [disabled]="formDisabled" [ngClass]="{ 'is-invalid': addInternalResultForm.submitted && nuclideId.errors?.required }" tabindex="8" required>
+                        </ng-select>
+                      </div>  
+                      <div *ngIf="addInternalResultForm.submitted && nuclideId.invalid" class="invalid-feedback">
+                        <div *ngIf="nuclideId.errors.required">Radionuclide is required</div>
+                      </div>
+                    </div>  
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="derivedCdeQty">Derived CDE (mrem)<span class="req">*</span></label>
+                        <input type="number" class="form-control" name="derivedCdeQty" [(ngModel)]="addIntDoseResultFormData.derivedCdeQty" #derivedCdeQty="ngModel" [disabled]="formDisabled" min="1" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" [ngClass]="{ 'is-invalid': addInternalResultForm.submitted && derivedCdeQty.errors?.required }" tabindex="5" required>
+                      </div>
+                      <div *ngIf="addInternalResultForm.submitted && derivedCdeQty.invalid" class="invalid-feedback">
+                        <div *ngIf="derivedCdeQty.errors.required">Derived CDE (mrem) is required</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>  
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

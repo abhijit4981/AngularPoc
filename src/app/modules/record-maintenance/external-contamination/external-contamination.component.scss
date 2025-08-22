@@ -1,0 +1,295 @@
+.right-container {
+    position: fixed;
+    left: 60px;
+    z-index: 2;
+    .panel {
+        width: 96%;
+        margin-bottom: 2px;
+        background-color: #fff;
+        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        .panel-heading {
+            padding: 13px 15px;
+            border-bottom: 1px solid transparent;
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+            .ra-cancel-btn {
+                text-align: right;
+                .sec-button-link {
+                    height: 30px;
+                }
+            }
+            .panel-title {
+                margin-top: 0;
+                margin-bottom: 0;
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: inherit;
+            }
+        }
+    }
+    .search-section {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 15px;
+        background: #D8D8D8;
+        max-height: 82px;
+        label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #3498DB;
+        }
+        .function_time_box {
+            height: 40px;
+            background: #fff;
+            text-align: left;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            .calendar-input-field {
+                height: 38px;
+                width: 88%;
+                border: none;
+                margin-right: 5px;
+                padding-left: 5px;
+            }
+            .calendar-img {
+                padding-bottom: 5px;
+                vertical-align: middle;
+            }
+        }
+        .emp-search {
+            ul.emp-search-result {
+                left: 0;
+                width: 100%;
+                overflow: hidden;
+                overflow-y: scroll;
+                opacity: 1;
+                position: absolute;
+                top: 41px;
+                display: block;
+                height: auto;
+                max-height: 215px;
+                box-sizing: border-box;
+                z-index: 1050;
+                background: #fff;
+                border: 1px solid #d8d8d8;
+                box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+                margin-top: -1px;
+                border-top-color: #e6e6e6;
+                border-bottom-right-radius: 2px;
+                border-bottom-left-radius: 2px;
+                -webkit-overflow-scrolling: touch;
+                li.emp-search-options {
+                    box-sizing: border-box;
+                    cursor: pointer;
+                    display: block;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    background-color: #fff;
+                    color: #333;
+                    padding: 8px 10px;
+                    white-space: nowrap;
+                    font-size: 100%;
+                }
+                li.emp-search-options:hover {
+                    background-color: #f5f5f5;
+                }
+                li:last-child {
+                    margin-bottom: 1px;
+                }
+            }
+        }
+        .search-button-section {
+            margin-right: 18px;
+            margin-top: 27px;
+        }
+    }
+}
+.card-list-container {
+    top: 140px;
+    padding-right: 5px;
+    padding-bottom: 50px;
+    .cards-left-panel {
+        .card-listing {
+            background: #D8D8D8;
+            height: auto;
+            padding-top: 10px;
+            padding-bottom: 2px;
+            .manage-each-card {
+                padding: 5px;
+                margin-bottom: 10px;
+                background-color: #fff;
+                font-size: 11px;
+                border: 1px solid #fff;
+                box-shadow: 1px 1px 2px #9B9B9B;
+                color: #000;
+                height: 50px;
+                .card-style {
+                    width: 100%;
+                    font-size: 15px;
+                    padding-top: 3px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    .card-text {
+                        float: left;
+                        font-size: 14px;
+                        padding-left: 3px;
+                        font-weight: bold;
+                        color: #3498DB;
+                        width: 90%;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        cursor: pointer;
+                    }
+                    .card-icon {
+                        float: right;
+                        text-align: right;
+                    }
+                    .card-date {
+                        clear: both;
+                        color: #333;
+                        font-size: 12px;
+                        padding-top: 5px;
+                        padding-left: 3px;
+                    }
+                }
+            }
+            .manage-each-card:hover {
+                border: 1px solid #9B9B9B;
+                background: #ccc;
+            }
+            .manage-each-card.active, .manage-each-card.active:hover {
+                border: 1px solid #9B9B9B;
+                background: #C8C8D2;
+            }
+        }
+    }
+    .card-view-outer-section {
+        height: auto;
+        .card-view-outer {
+            background: #D8D8D8;
+            width: 100%;
+            height: auto;
+            padding: 10px 15px;
+            .card-view-outer-panel {
+                width: 100%;
+                height: auto;
+                background-color: #fff;
+                border: 1px solid #9B9B9B;
+                .card-name-section {
+                    overflow: hidden;
+                    width: 100%;
+                    padding: 10px 5px;
+                    margin-bottom: 10px;
+                    text-align: left;
+                    border-bottom: 1px solid #9B9B9B;
+                    .card-name {
+                        float: left;
+                        font-size: 18px;
+                        font-weight: bold;
+                        margin: 7px;
+                    }
+                    .contam-button-section {
+                        margin-top: 2px;
+                        margin-right: 5px;
+                    }
+                }
+                .card-subitem-list-container {
+                    margin: 0px 5px 0 5px;
+                    height: auto;
+                    clear: both;
+                    .calendar_box {
+                        height: 40px;
+                        background: #fff;
+                        text-align: left;
+                        font-size: 14px;
+                        border: 1px solid #ccc; 
+                        .calendar-input-field {
+                            height: 38px;
+                            width: 88%;
+                            border: none;
+                            margin-right: 5px;
+                            padding-left: 5px;    
+                        }
+                        .calendar-img {
+                            padding-bottom: 5px;
+                            vertical-align: middle;
+                        }
+                    }
+                    .collapse-link {
+                        margin-left: 1rem;
+                        font-weight: normal;
+                        font-size: 20px;
+                        color: #9B9B9B;
+                        background-color: #fff;
+                        border-radius: 50%;
+                        border: 1px solid #9B9B9B;
+                        height: 30px;
+                        width: 30px;
+                        .collapse-icon {
+                            font-size: 16px;
+                            margin-top: 6px;
+                            margin-left: 10px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+.save-button {
+    height: 30px;
+    margin-right: 25px;
+    padding: 8px 25px;
+    background: #ffffff;
+    color: #D0021B;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #979797;
+    border-style: inset;
+    cursor: pointer;
+    text-transform: uppercase;    
+}
+.save-button[disabled] {
+    opacity: 0.5;
+    cursor: auto;
+}   
+.edit-button {
+    height: 30px;
+    margin-right: 3px;
+    padding: 8px 25px;
+    background: #ffffff;
+    color: #000;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #979797;
+    border-style: inset;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+.cancel-button {
+    height: 30px;
+    padding: 8px 16px;
+    background: #fff;
+    color:#000;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #979797;
+    border-style: inset;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.panel-default>.panel-heading {
+    color: #333;
+    border-color: #ddd;
+}
+[data-toggle="collapse"] .fa:before {  
+    content: "\f106";
+}
+  
+[data-toggle="collapse"].collapsed .fa:before {
+    content: "\f107";
+}

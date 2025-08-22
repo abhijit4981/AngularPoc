@@ -1,0 +1,70 @@
+<div class="row">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 right-container">
+    <div class="panel panel-default">
+      <div class="panel-heading lvoilet-panel text-left row">
+        <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+          <h3 class="panel-title">Cross references</h3>
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6 ra-cancel-btn">
+          <a routerLink="/dashboard" class="none-deco"><span class="sec-button-link" role="button">Close</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 card-list-container row">
+    <div class="col-sm-3 col-md-3 col-lg-3">
+      <div class="cards-left-panel">
+        <div class="col-md-12 col-sm-12 col-lg-12 card-listing">
+          <div *ngFor="let typeGroup of allTypeGroups; let i=index;">
+            <div class="manage-each-card" [ngClass]="{'active': i===selectedTypeGroupRef}">
+              <div class="card-style">
+                <a class="card-text" (click)="onShowCrossRefDetails(i, typeGroup)">{{typeGroup.description}}</a>
+                <div class="card-icon">
+                  <a (click)="onEnableCrossReferenceEdit(i, typeGroup)" class="enable-cursor"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-9 col-md-9 col-lg-9 card-view-outer-section padding-lr-zero" *ngIf="showDetails">
+      <div class="card-view-outer">
+        <div class="card-view-outer-panel">
+          <form name="crossReferenceForm" #crossReferenceForm="ngForm" novalidate>
+            <div class="card-name-section">
+              <div class="card-name">{{allTypeRefObj.description}}</div>
+              <div class="contam-button-section float-right" *ngIf="formDisabled">
+                <button class="edit-button float-left" (click)="onEnableCrossReferenceEdit(selectedTypeGroupRef, allTypeRefObj)">Edit</button>
+              </div>
+              <div class="contam-button-section float-right" *ngIf="!formDisabled">
+                <button class="save-button float-left" (click)="onUpdateCrossReferenceType()" [ngClass]="{'is-disabled': crossReferenceForm.invalid || !crossReferenceForm.dirty}" [disabled]="crossReferenceForm.invalid || !crossReferenceForm.dirty">Save</button>
+                <button type="button" class="cancel-button float-right" (click)="onCancelCrossReferenceEdit($event)" >Cancel</button>
+              </div>
+            </div>
+            <div class="card-subitem-list-container">
+              <div class="ui-helper-reset">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                  <table class="table inner-table">
+                    <tbody>
+                      <tr>
+                        <th>Name</th>
+                        <th>Code</th>
+                      </tr>
+                      <tr *ngFor="let typeRef of allTypeRefObj.typeRefs; let i=index;">
+                        <td class="lable-column">{{typeRef.description}}</td>
+                        <td class="input-field-column nopaddingall">
+                          <input type="text" class="table-input-field form-control" [(ngModel)]="typeRef.legacyCode" #typeCode="ngModel" name="{{typeRef.typeCode}}" [ngClass]="{ 'is-invalid': typeCode.errors?.required }" [disabled]="formDisabled" required>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table> 
+                </div>
+              </div>
+            </div>
+          </form>  
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
