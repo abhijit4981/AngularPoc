@@ -1,0 +1,19 @@
+<header id="header" *ngIf="!loginRedirected">
+  <div class="row">
+    <div class="col-sm-8 logo">
+      <img src="/assets/images/cardinalLogo.png" width="166" height="55" alt="Dosimetry" title="Dosimetry"
+        />
+      <p>Nuclear & Precision Health Solutions - Dosimetry Admin</p>
+    </div>
+    <div class="col-sm-2 logged-user margin-top30" *ngIf="authenticated">
+      <label>User:</label>
+      <span>{{userInfo!==undefined ? userInfo.lastName : ''}}{{userInfo!==undefined && userInfo.firstName !==null ? ', '+userInfo.firstName : ''}}</span>
+    </div>
+    <div class="col-sm-2 header-buttons margin-top30" *ngIf="authenticated">
+      <a class="prim-button-link margin-top3" id="logout" [routerLink]="['/logout']" [queryParams]="{manual: true}">LOG OUT</a>
+    </div>
+  </div>
+</header>
+<div class="row header_line" aria-hidden="false">
+  <div class="col-sm-12"></div>
+</div>

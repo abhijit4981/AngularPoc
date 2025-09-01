@@ -1,0 +1,130 @@
+<div class="row">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 right-container">
+    <div class="panel panel-default">
+      <div class="panel-heading lvoilet-panel text-left row">
+        <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+          <h3 class="panel-title">Participant</h3>
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6 ra-cancel-btn">
+          <a routerLink="/dashboard" class="none-deco"><span class="sec-button-link" role="button">Close</span></a>
+        </div>
+      </div>
+    </div>
+    <form name="participantSearchForm" #participantSearchForm="ngForm" (ngSubmit)="submitParticipantSearch()" novalidate>
+      <div class="search-section row">
+        <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6 row">
+          <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6 emp-search">
+            <label>Participant Number</label>
+            <div style="position: relative;">
+              <input type="text" class="form-control search-input" name="participantNumber" 
+              [(ngModel)]="participantSearch.participantNumber" #participantNumber="ngModel" 
+             onkeypress="return event.charCode >= 48 && event.charCode <= 57" maxlength="5" [ngClass]="{'is-invalid': searchDosimeterError}">
+            </div>
+            <div class="error" *ngIf="searchDosimeterError">{{searchDosimeterErrorMsg}}</div>
+          </div>
+          <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6" *ngIf="allDosimeterResults.length>0">
+            <div class="participant-name">{{allDosimeterResults[0].participantName}}</div>
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+          <div class="search-button-section float-right">
+            <button class="save-button float-left">Search</button>
+            <button class="cancel-button float-left margin-right25" (click)="onResetParticipantSearchForm($event)">Clear</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 card-list-container row">
+    <div class="col-sm-3 col-md-3 col-lg-3">
+      <div class="no-result" *ngIf="noDosimeterResult">No results found.</div>
+      <div class="cards-left-panel" *ngIf="allDosimeterResults.length>0">
+        <div class="col-md-12 col-sm-12 col-lg-12 card-listing">
+          <div class="card-repeat" *ngFor="let dosimeterResult of allDosimeterResults; let i=index">
+            <div class="manage-each-card" [ngClass]="{'active': i===selectedDoseimeter}">
+              <div class="card-style">
+                <a class="card-text" (click)="onShowDosimeterResult(i, dosimeterResult)">
+                  <span>{{dosimeterResult.locationName}}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-9 col-md-9 col-lg-9 card-view-outer-section padding-lr-zero" *ngIf="showDetails">
+      <div class="card-view-outer">
+        <div class="card-view-outer-panel">
+          <form name="updateDosimeterResultForm" #updateDosimeterResultForm="ngForm" novalidate>  
+            <div class="card-subitem-list-container mt-3">
+              <div class="ui-helper-reset">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="dosimetryParticipantId">Participant Number</label>
+                        <input type="text" class="form-control" name="dosimetryParticipantId" [(ngModel)]="dosimeterResultObj.dosimetryParticipantId" #dosimetryParticipantId="ngModel" [disabled]="formDisabled" tabindex="1">
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="accountId">Account</label>
+                        <ng-select [items]="allAccounts"
+                          bindValue="accountId"
+                          bindLabel="dosimetryAccountId"
+                          placeholder=""
+                          [(ngModel)]="dosimeterResultObj.accountId" #accountId="ngModel" name="accountId" [disabled]="formDisabled" tabindex="2">
+                        </ng-select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="participantName">Name</label>
+                        <input type="text" class="form-control" name="participantName" [(ngModel)]="dosimeterResultObj.participantName" #participantName="ngModel" [disabled]="formDisabled" tabindex="3">
+                      </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                      <div class="form-field-wrap">
+                        <label for="locationId">Location</label>
+                        <ng-select [items]="allLocations"
+                          bindValue="locationId"
+                          bindLabel="locationNameForDropdown"
+                          placeholder=""
+                          [(ngModel)]="dosimeterResultObj.locationId" #locationId="ngModel" name="locationId" [disabled]="formDisabled" tabindex="4">
+                        </ng-select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-10 col-md-10 col-lg-10 row">
+                      <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                        <div class="form-field-wrap">
+                          <label for="inceptionDate">Inception Date</label>
+                          <div class="calendar_box" [ngClass]="{'input-disabled': formDisabled}">
+                            <input type="text" class="calendar-input-field" [owlDateTime]="dt2" name="inceptionDate" [(ngModel)]="dosimeterResultObj.inceptionDate" #inceptionDate="ngModel" [disabled]="formDisabled" [ngClass]="{'input-disabled': formDisabled}" tabindex="5" placeholder="{{!formDisabled ? 'mm/dd/yyyy' : ''}}">
+                            <owl-date-time [pickerType]="'calendar'" #dt2></owl-date-time>
+                            <img src="/assets/images/calendar_icon.svg" class="wh-20 calendar-img trigger" [owlDateTimeTrigger]="dt2">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm-6 col-md-6 col-lg-6 form-group">
+                        <div class="form-field-wrap">
+                          <label for="dosimeterCodeCde">Dosimeter Code</label>
+                          <ng-select [items]="allDosimeterTypeRefs"
+                            bindValue="typeCode"
+                            bindLabel="description"
+                            placeholder=""
+                            [(ngModel)]="dosimeterResultObj.dosimeterCodeCde" #dosimeterCodeCde="ngModel" name="dosimeterCodeCde" [disabled]="formDisabled" tabindex="6">
+                          </ng-select>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>    
+          </form>
+        </div>
+      </div>
+  </div>
+</div>

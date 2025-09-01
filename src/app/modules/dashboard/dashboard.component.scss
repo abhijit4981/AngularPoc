@@ -1,0 +1,302 @@
+@import "../../../assets/css/styles-variables";
+
+.dashboard-box {
+    margin: 20px 0 40px -15px;
+    .last-proccessed {
+        padding: 10px;
+        background: #d3cdb3;
+        overflow: hidden;
+        margin: 0px;
+        p {
+            display: block;
+            margin-bottom: 8px;
+            overflow: hidden;
+            label {
+                width:65%;
+                float: left;
+                padding-right:5px;
+                text-align: right;
+                margin: 0
+            }
+            span {
+                width: 35%;
+                float: left;
+            }
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+} 
+
+.panel {
+    width: 100%;
+    margin-bottom: 5px;
+    .panel-heading {
+        padding: 10px 15px;
+        border-bottom: 1px solid transparent;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+        .panel-title {
+            margin-top: 0;
+            margin-bottom: 0;
+            font-size: 22px;
+            color: inherit;
+        }
+    }
+}
+
+.panel-default>.panel-heading {
+    color: #333;
+    border-color: #ddd;
+}
+
+.dashboard-box-section {
+    .flag-items {
+        background: $box-light-blue;
+        .box-content {
+            padding: 10px;
+            background: #B8D0D5;
+        }
+        .box-title {
+            font-size: $box-count-value;
+            font-weight: bold;
+            padding: 10px 0;
+        }
+    }
+    .status_number.dboard_col_width {
+        width: 100%;
+        height: auto;
+    }
+}
+
+.box {
+    .reject-items {
+        background: $box-light-gray;
+        .box-content {
+            padding: 10px;
+            background: #d3cdb3;            
+        }
+        .box-title {
+            font-size: $box-count-value;
+            font-weight: bold;
+            padding: 10px 0;
+        }        
+    }    
+}
+
+.list-of-records {
+    padding: 5px;
+    ul{
+        margin: 0;
+        padding: 0;
+        list-style: none;
+     }
+    li {
+        border: $record-item-border;
+        background: $default-bg-color;
+        padding: 5px;
+        overflow: hidden;
+        margin-bottom: 5px;
+        clear: both;
+        a {
+            display: block;
+            color: $default-font-color;
+            .title {
+                font-weight: bold;
+                margin-bottom: 5px;
+                display: block;
+            }
+            .name {
+                display: block;
+                font-weight: normal;
+                margin: 0;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+            .reason {
+                display: block;
+                margin: 0
+            }
+            &:hover {
+                text-decoration: none;
+            }
+        }
+        &:last-child {
+            margin:0;
+            button {
+                border: none;
+                background: none;
+                text-align: center;
+                height:20px;
+                display: block;
+                width:100%;
+                i {
+                    font-size: 8px;
+                    margin: 0 2px;
+                    color:black;
+                }
+                &:focus {
+                    box-shadow: none;
+                }
+            }
+        }
+    }
+    
+}
+
+.modal-popup {
+    .modal-header {
+        background: #fff;
+        padding:5px;
+        border-bottom:1px solid #999;
+        display: block;
+        overflow: hidden;
+        h5 {
+            padding:3px 0 0;
+            float:left;
+        }
+
+        .save-button {
+            height: 30px;
+            margin-right: 25px;
+            padding: 8px 25px;
+            background: #ffffff;
+            color: #D0021B;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #979797;
+            border-style: inset;
+            cursor: pointer;
+            text-transform: uppercase;    
+        }
+        .save-button[disabled] {
+            opacity: 0.5;
+            cursor: auto;
+        } 
+        .cancel-button {
+            height: 30px;
+            padding: 8px 16px;
+            background: #fff;
+            color:#000;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #979797;
+            border-style: inset;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        i {
+            color:red;
+            padding: 8px 0 0 8px;
+            &:before {
+                margin-right:3px;
+            }
+        }
+    }
+
+    .modal-form-section {
+        .form-group {
+            .form-field-wrap {
+                label {
+                    display: block
+                }
+                .form-control, .ng-select, .calendar_box  {
+                    width:88%;
+                    display: inline-block;
+                }
+            }
+            .invalid-icon {
+                color:red;
+                margin-left:5px;
+            }
+        }
+    }
+
+    .col-adjust {
+        padding-right:0;
+        .form-group {
+            &:last-child {
+                padding:0;
+            }
+            .calendar-input-field {
+                height: 38px;
+                width: 75%;
+                border: none;
+                margin-right: 5px;
+                padding-left: 5px;    
+            }        
+        }
+    }
+
+    .calendar_box {
+        height: 40px;
+        background: #fff;
+        text-align: left;
+        font-size: 14px;
+        border: 1px solid #ccc; 
+        .calendar-input-field {
+            height: 38px;
+            width: 88%;
+            border: none;
+            margin-right: 5px;
+            padding-left: 5px;    
+        }
+        .calendar-img {
+            padding-bottom: 5px;
+            vertical-align: middle;
+        }
+    }
+
+    .collapse-link {
+        margin-left: 1rem;
+        font-weight: normal;
+        font-size: 20px;
+        color: #9B9B9B;
+        background-color: #fff;
+        border-radius: 50%;
+        border: 1px solid #9B9B9B;
+        height: 30px;
+        width: 30px;
+        .collapse-icon {
+            font-size: 16px;
+            margin-top: 6px;
+            margin-left: 10px;
+        }
+    }
+    [data-toggle="collapse"] .fa:before {  
+        content: "\f106";
+    }
+      
+    [data-toggle="collapse"].collapsed .fa:before {
+        content: "\f107";
+    }
+
+    #openCollapse {
+        .form-group {
+            .form-control, .ng-select, .calendar_box  {
+                width:100%;
+            }
+        }
+    }
+}
+
+.cdk-overlay-pane {
+    z-index: 10000;
+}
+
+
+
+@media (max-width: 767px) and (min-width: 0px) {
+    .left-box {
+        padding-right: 0px;
+    }
+    .center-box {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    .right-box {
+        padding-left: 0px;
+    }
+}

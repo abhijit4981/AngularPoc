@@ -1,0 +1,47 @@
+@import "./../../../assets/css/styles-variables";
+
+.modal-content {
+    border: 5px solid #c8c8d2;
+    border-radius: 0px;
+    .modal-header {
+        background: #c8c8d2;
+        border-radius: 0px !important;
+        border-bottom: 0px;
+        padding: 5px 5px;
+    }
+    .modal-body {
+        font-size: 14px;
+        line-height: 1.42857143;
+    }
+    .modal-footer {
+        border-top: 0px;
+    }
+}
+.save-button {
+    height: 30px;
+    margin-right: 25px;
+    padding: 8px 25px;
+    background: #ffffff;
+    color: #D0021B;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #979797;
+    border-style: inset;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+.cancel-button {
+    height: 30px;
+    padding: 8px 16px;
+    background: #fff;
+    color: #000;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #979797;
+    border-style: inset;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+button.close {
+    outline: none !important;
+}
