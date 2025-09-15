@@ -1,101 +1,127 @@
-import { TestBed, async } from '@angular/core/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-
-import { CoreModule } from './core/core.module';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatSelectModule } from '@angular/material/select';
-import { MatOptionModule } from '@angular/material/core';
-import { MatSortModule } from '@angular/material/sort';
-import { MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { Router, ActivatedRoute } from '@angular/router';
+import { of, Subject } from 'rxjs';
+import { Location } from '@angular/common';
 import { AppComponent } from './app.component';
-import { HeaderComponent } from './common/header/header.component';
-import { FooterComponent } from './common/footer/footer.component';
-import { NavbarComponent } from './common/navbar/navbar.component';
-import { DashboardComponent } from './modules/dashboard/dashboard.component';
-import { PageNotFoundComponent } from './modules/page-not-found/page-not-found.component';
-
-import { RouterTestingModule } from '@angular/router/testing';
 import { CommonService } from './shared/services/common.service';
-import { CommonModule } from '@angular/common';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PublisherService } from './core/services/publisher.service';
+import { AuthService } from './core/services/auth.service';
 
 describe('AppComponent', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        BrowserAnimationsModule,
-        RouterTestingModule,
-        HttpClientTestingModule,
-        MatAutocompleteModule,
-        MatCardModule,
-        MatButtonModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatDialogModule,
-        MatTabsModule,
-        MatRadioModule,
-        MatCheckboxModule,
-        MatTableModule,
-        MatPaginatorModule,
-        MatSortModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatDividerModule,
-        MatGridListModule,
-        MatIconModule,
-        MatTooltipModule,
-        MatExpansionModule,
-        MatProgressSpinnerModule,
-        MatDatepickerModule,
-        MatNativeDateModule,
-        CoreModule,
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule
-      ],
-      declarations: [
-        AppComponent, 
-        HeaderComponent,
-        FooterComponent,
-        NavbarComponent,
-        DashboardComponent,
-        PageNotFoundComponent
-      ],
-      providers: [ CommonService ],
-      schemas: [NO_ERRORS_SCHEMA]
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
+
+  let commonServiceSpy: jasmine.SpyObj<CommonService>;
+  let publisherSpy: jasmine.SpyObj<PublisherService>;
+  let authSpy: jasmine.SpyObj<AuthService>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let locationSpy: jasmine.SpyObj<Location>;
+  let routeSubject: Subject<any>;
+
+  beforeEach(async () => {
+    commonServiceSpy = jasmine.createSpyObj('CommonService', ['getAllLocations', 'getAllTypeGroups', 'getAllTypeRefs']);
+    publisherSpy = jasmine.createSpyObj('PublisherService', ['notifyAuth', 'notifyAllLocations', 'notifyAllTypeGroups', 'notifyAllTypeRefs', 'notifySignOutRequest', 'notifyPopupModalOpen']);
+    authSpy = jasmine.createSpyObj('AuthService', ['isAuthenticated', 'notifyUserAction'], { userActionOccured: new Subject<void>() });
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    locationSpy = jasmine.createSpyObj('Location', ['path']);
+    routeSubject = new Subject();
+
+    await TestBed.configureTestingModule({
+      declarations: [AppComponent],
+      providers: [
+        { provide: CommonService, useValue: commonServiceSpy },
+        { provide: PublisherService, useValue: publisherSpy },
+        { provide: AuthService, useValue: authSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: Location, useValue: locationSpy },
+        { provide: ActivatedRoute, useValue: { queryParamMap: routeSubject.asObservable() } }
+      ]
     }).compileComponents();
+
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+  });
+
+  it('should call notifyUserAction on resetTimer', () => {
+    component.resetTimer();
+    expect(authSpy.notifyUserAction).toHaveBeenCalled();
+  });
+
+  it('should handle /logout?manual=false path', () => {
+    authSpy.isAuthenticated.and.returnValue(false);
+    locationSpy.path.and.returnValue('/logout?manual=false');
+    component.ngOnInit();
+    expect(publisherSpy.notifyAuth).toHaveBeenCalledWith(false);
+  });
+
+  it('should handle access-token in query params', fakeAsync(() => {
+    authSpy.isAuthenticated.and.returnValue(false);
+    locationSpy.path.and.returnValue('/');
+    component.ngOnInit();
+
+    routeSubject.next(new Map([['access-token', 'abc123']]));
+    tick();
+
+    expect(sessionStorage.getItem('Access_Token')).toBe('abc123');
+    expect(publisherSpy.notifyAuth).toHaveBeenCalledWith(true);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['dashboard']);
   }));
 
-  /* it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app).toBeTruthy();
-  }); */
+  it('should call getAllMasterData if authenticated', fakeAsync(() => {
+    authSpy.isAuthenticated.and.returnValue(true);
+    locationSpy.path.and.returnValue('/');
+    spyOn(component, 'getAllMasterData');
+    component.ngOnInit();
+    tick();
+    expect(component.getAllMasterData).toHaveBeenCalled();
+  }));
 
-  /* it('should have properties defined', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.allLocationMasterData).toBeDefined();
-    expect(app.allTypeRefMasterData).toBeDefined();
-    expect(app.allTypeGroupMasterData).toBeDefined();
-  }); */
+  it('should populate locations and notify publisher', () => {
+    const mockData = [{ isotracLocationId: '123', locationName: 'Lab', seriesValue: 'A' }];
+    commonServiceSpy.getAllLocations.and.returnValue(of(mockData));
+    component.getAllLocationMsterData();
+    expect(component.allLocationMasterData.length).toBe(1);
+    expect(publisherSpy.notifyAllLocations).toHaveBeenCalledWith(true);
+  });
+
+  it('should populate type groups and notify publisher', () => {
+    const mockGroups = [{ id: 1 }];
+    commonServiceSpy.getAllTypeGroups.and.returnValue(of(mockGroups));
+    component.getAllTypeGroupsMasterData();
+    expect(component.allTypeGroupMasterData).toEqual(mockGroups);
+    expect(publisherSpy.notifyAllTypeGroups).toHaveBeenCalledWith(true);
+  });
+
+  it('should populate type refs with legacy label and notify publisher', () => {
+    const mockRefs = [{ description: 'desc', legacyCode: '001' }];
+    commonServiceSpy.getAllTypeRefs.and.returnValue(of(mockRefs));
+    component.getAllTypeRefsMasterData();
+    expect(component.allTypeRefMasterData[0]['legacyLabelForDropdown']).toContain('desc - 001');
+    expect(publisherSpy.notifyAllTypeRefs).toHaveBeenCalledWith(true);
+  });
+
+ it('should perform logout when idle timer completes', fakeAsync(() => {
+  authSpy.isAuthenticated.and.returnValue(true);
+  locationSpy.path.and.returnValue('/');
+
+  // run ngOnInit → this calls performResetTimer internally
+  component.ngOnInit();
+
+  // fast forward idle timer to completion
+  tick(30 * 60 * 1000); // or smaller if you mock endTime
+
+  expect(routerSpy.navigate).toHaveBeenCalledWith(['/logout'], { queryParams: { manual: false } });
+  expect(publisherSpy.notifySignOutRequest).toHaveBeenCalled();
+  expect(publisherSpy.notifyAuth).toHaveBeenCalledWith(false);
+  expect(publisherSpy.notifyPopupModalOpen).toHaveBeenCalled();
+}));
+
+
+  it('should cleanup subscriptions on destroy', () => {
+    spyOn(component.unsubscribe$, 'next');
+    spyOn(component.unsubscribe$, 'complete');
+    component.ngOnDestroy();
+    expect(component.unsubscribe$.next).toHaveBeenCalled();
+    expect(component.unsubscribe$.complete).toHaveBeenCalled();
+  });
 });
